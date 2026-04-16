@@ -1,6 +1,4 @@
 ﻿import { useState, useEffect } from 'react'
-
-import { doc, getDoc } from 'firebase/firestore'
 import { auth, db, _onAuthStateChanged as onAuthStateChanged } from './firebase'
 import Auth from './components/Auth'
 import TabBar from './components/TabBar'
@@ -12,94 +10,44 @@ import type { UserProfile } from './types'
 
 type Tab = 'meditation' | 'sharing' | 'my'
 
-const TAB_LABELS: Record<Tab, string> = {
-  meditation: '臾듭긽',
-  sharing: '?섎닎',
-  my: 'MY',
-}
-
 export default function App() {
   const [user, setUser] = useState<UserProfile | null | undefined>(undefined)
   const [activeTab, setActiveTab] = useState<Tab>('meditation')
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser: any) => {
       if (firebaseUser) {
-        const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid))
-        if (userDoc.exists()) {
-          setUser({
-            uid: firebaseUser.uid,
-            username: userDoc.data().username,
-            createdAt: userDoc.data().createdAt?.seconds * 1000 || Date.now(),
-            isAdmin: userDoc.data().isAdmin === true,
-          })
-        } else {
-          // Fallback: use displayName
-          setUser({
-            uid: firebaseUser.uid,
-            username: firebaseUser.displayName || '?ъ슜??,
-            createdAt: Date.now(),
-          })
-        }
+        setUser({
+          uid: firebaseUser.uid,
+          username: firebaseUser.username || '데모 사용자',
+          createdAt: Date.now(),
+          isAdmin: firebaseUser.isAdmin === true,
+        })
       } else {
         setUser(null)
       }
     })
-    return unsubscribe
+    return () => unsubscribe()
   }, [])
 
-  // Loading
-  if (user === undefined) {
-    return (
-      <div style={{
-        height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
-        background: 'linear-gradient(160deg, #6366f1 0%, #8b5cf6 100%)',
-        flexDirection: 'column', gap: '16px',
-      }}>
-        <div style={{
-          width: '60px', height: '60px', borderRadius: '16px',
-          background: 'rgba(255,255,255,0.2)', display: 'flex',
-          alignItems: 'center', justifyContent: 'center', fontSize: '30px',
-        }}>?븡截?/div>
-        <div style={{ width: '32px', height: '32px', border: '3px solid rgba(255,255,255,0.3)', borderTopColor: '#fff', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
-      </div>
-    )
-  }
-
+  if (user === undefined) return <div className=\"loading\">🕊️ 불러오는 중...</div>
   if (!user) return <Auth />
-
-  // 愿由ъ옄 ?꾩슜 ?섏씠吏
   if (user.isAdmin) return <AdminPage />
 
   return (
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column', background: 'var(--bg)' }}>
-      {/* Header */}
-      <div className="header">
+      <div className=\"header\">
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div>
-            <div className="header-title">
-              {activeTab === 'meditation' ? '?븡截??ㅻ뒛??臾듭긽' : activeTab === 'sharing' ? '?뮠 ?섎닎' : `?뫀 ${user.username}`}
-            </div>
-          </div>
-          <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
-            {new Date().toLocaleDateString('ko-KR', { month: 'short', day: 'numeric', weekday: 'short' })}
+          <div className=\"header-title\">
+            {activeTab === 'meditation' ? '🕊️ 오늘의 묵상' : activeTab === 'sharing' ? '💬 나눔' : '👤 마이페이지'}
           </div>
         </div>
       </div>
-
-      {/* Tab content */}
       <div style={{ flex: 1, overflow: 'hidden', position: 'relative' }}>
-        <div style={{ display: activeTab === 'meditation' ? 'flex' : 'none', flexDirection: 'column', height: '100%' }}>
-          <MeditationTab user={user} />
-        </div>
-        <div style={{ display: activeTab === 'sharing' ? 'flex' : 'none', flexDirection: 'column', height: '100%' }}>
-          <SharingTab user={user} />
-        </div>
-        <div style={{ display: activeTab === 'my' ? 'flex' : 'none', flexDirection: 'column', height: '100%' }}>
-          <MyTab user={user} />
-        </div>
+        {activeTab === 'meditation' && <MeditationTab user={user} />}
+        {activeTab === 'sharing' && <SharingTab user={user} />}
+        {activeTab === 'my' && <MyTab user={user} />}
       </div>
-
       <TabBar active={activeTab} onChange={setActiveTab} />
     </div>
   )

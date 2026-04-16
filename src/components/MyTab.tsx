@@ -1,7 +1,7 @@
-﻿import { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { collection, query, where, orderBy, getDocs, doc, updateDoc } from 'firebase/firestore'
-
-import { db, auth, _signOut as signOut } from '../firebase'
+import { signOut } from 'firebase/auth'
+import { db, auth } from '../firebase'
 import type { QTEntry, UserProfile } from '../types'
 
 interface Props {
@@ -10,7 +10,7 @@ interface Props {
 
 function formatDateKo(dateStr: string) {
   const [y, m, d] = dateStr.split('-')
-  const days = ['??, '??, '??, '??, '紐?, '湲?, '??]
+  const days = ['일', '월', '화', '수', '목', '금', '토']
   const date = new Date(Number(y), Number(m) - 1, Number(d))
   return `${y}.${m}.${d} (${days[date.getDay()]})`
 }
@@ -90,7 +90,7 @@ export default function MyTab({ user }: Props) {
   async function saveEdit() {
     if (!editState) return
     if (!editState.q1.trim()) {
-      setEditState(s => s ? { ...s, error: '泥?踰덉㎏ 吏덈Ц???듯빐二쇱꽭?? } : s)
+      setEditState(s => s ? { ...s, error: '첫 번째 질문에 답해주세요' } : s)
       return
     }
     setEditState(s => s ? { ...s, saving: true, error: '' } : s)
@@ -105,7 +105,7 @@ export default function MyTab({ user }: Props) {
       setEntries(prev => prev.map(e => e.id === updated.id ? updated : e))
       setEditState(null)
     } catch {
-      setEditState(s => s ? { ...s, saving: false, error: '???以??ㅻ쪟媛 諛쒖깮?덉뼱?? } : s)
+      setEditState(s => s ? { ...s, saving: false, error: '저장 중 오류가 발생했어요' } : s)
     }
   }
 
@@ -115,7 +115,7 @@ export default function MyTab({ user }: Props) {
   if (loading) {
     return (
       <div className="scroll-area" style={{ padding: '20px' }}>
-        <div className="loading"><div className="spinner" /><span>遺덈윭?ㅻ뒗 以?..</span></div>
+        <div className="loading"><div className="spinner" /><span>불러오는 중...</span></div>
       </div>
     )
   }
@@ -124,8 +124,8 @@ export default function MyTab({ user }: Props) {
     return (
       <div className="scroll-area" style={{ padding: '20px' }}>
         <div className="card" style={{ textAlign: 'center', color: 'var(--text-muted)' }}>
-          <p>?좑툘 湲곕줉??遺덈윭?ㅼ? 紐삵뻽?댁슂</p>
-          <p style={{ fontSize: '13px' }}>?좎떆 ???ㅼ떆 ?쒕룄?댁＜?몄슂</p>
+          <p>⚠️ 기록을 불러오지 못했어요</p>
+          <p style={{ fontSize: '13px' }}>잠시 후 다시 시도해주세요</p>
         </div>
       </div>
     )
@@ -134,7 +134,7 @@ export default function MyTab({ user }: Props) {
   return (
     <>
       <div className="scroll-area" style={{ padding: '16px', paddingBottom: '24px' }}>
-        {/* ?꾨줈??*/}
+        {/* 프로필 */}
         <div className="card" style={{ marginBottom: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
             <div style={{
@@ -147,40 +147,40 @@ export default function MyTab({ user }: Props) {
             </div>
             <div>
               <div style={{ fontSize: '17px', fontWeight: 700 }}>{user.username}</div>
-              <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>珥?{total}??臾듭긽 ?꾨즺</div>
+              <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>총 {total}일 묵상 완료</div>
             </div>
           </div>
           <button
             style={{ padding: '8px 14px', background: 'var(--surface2)', border: 'none', borderRadius: '10px', fontSize: '13px', fontWeight: 600, cursor: 'pointer', color: 'var(--text-muted)' }}
             onClick={() => signOut(auth)}
           >
-            濡쒓렇?꾩썐
+            로그아웃
           </button>
         </div>
 
-        {/* ?ㅽ듃由?*/}
+        {/* 스트릭 */}
         <div className="streak-badge" style={{ marginBottom: '16px' }}>
-          <div style={{ fontSize: '36px' }}>?뵦</div>
+          <div style={{ fontSize: '36px' }}>🔥</div>
           <div>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px' }}>
               <span className="streak-count">{streak}</span>
-              <span style={{ fontSize: '16px', fontWeight: 600 }}>??/span>
+              <span style={{ fontSize: '16px', fontWeight: 600 }}>일</span>
             </div>
-            <div className="streak-label">?곗냽 臾듭긽 以묒씠?먯슂!</div>
+            <div className="streak-label">연속 묵상 중이에요!</div>
           </div>
           <div style={{ marginLeft: 'auto', textAlign: 'right' }}>
             <div style={{ fontSize: '22px', fontWeight: 800 }}>{total}</div>
-            <div style={{ fontSize: '12px', opacity: 0.85 }}>珥?臾듭긽</div>
+            <div style={{ fontSize: '12px', opacity: 0.85 }}>총 묵상</div>
           </div>
         </div>
 
-        {/* 湲곕줉 紐⑸줉 */}
-        <div className="section-label">?섏쓽 臾듭긽 湲곕줉</div>
+        {/* 기록 목록 */}
+        <div className="section-label">나의 묵상 기록</div>
 
         {entries.length === 0 ? (
           <div className="empty-state">
-            <div className="empty-state-icon">?뱰</div>
-            <p className="empty-state-text">?꾩쭅 臾듭긽 湲곕줉???놁뼱??<br />泥?QT瑜??묒꽦?대낫?몄슂!</p>
+            <div className="empty-state-icon">📖</div>
+            <p className="empty-state-text">아직 묵상 기록이 없어요.<br />첫 QT를 작성해보세요!</p>
           </div>
         ) : (
           entries.map(entry => (
@@ -191,16 +191,16 @@ export default function MyTab({ user }: Props) {
                   onClick={e => { e.stopPropagation(); openEdit(entry) }}
                   style={{ padding: '4px 10px', background: 'var(--surface2)', border: 'none', borderRadius: '8px', fontSize: '12px', fontWeight: 600, cursor: 'pointer', color: 'var(--text-muted)', flexShrink: 0, marginLeft: '8px' }}
                 >
-                  ?륅툘 ?섏젙
+                  ✏️ 수정
                 </button>
               </div>
               <div style={{ display: 'flex', gap: '6px', marginBottom: '8px', flexWrap: 'wrap' }}>
-                <span className="chip chip-public">Q1 怨듦컻</span>
+                <span className="chip chip-public">Q1 공개</span>
                 <span className={entry.q2.isPublic ? 'chip chip-public' : 'chip chip-private'}>
-                  Q2 {entry.q2.isPublic ? '怨듦컻' : '鍮꾧났媛?}
+                  Q2 {entry.q2.isPublic ? '공개' : '비공개'}
                 </span>
                 <span className={entry.q3.isPublic ? 'chip chip-public' : 'chip chip-private'}>
-                  Q3 {entry.q3.isPublic ? '怨듦컻' : '鍮꾧났媛?}
+                  Q3 {entry.q3.isPublic ? '공개' : '비공개'}
                 </span>
               </div>
               {entry.q1.text && <div className="my-entry-preview">{entry.q1.text}</div>}
@@ -209,7 +209,7 @@ export default function MyTab({ user }: Props) {
         )}
       </div>
 
-      {/* ?곸꽭 蹂닿린 紐⑤떖 */}
+      {/* 상세 보기 모달 */}
       {detail && (
         <div className="modal-overlay" onClick={() => setDetail(null)}>
           <div className="modal-sheet" onClick={e => e.stopPropagation()}>
@@ -222,49 +222,49 @@ export default function MyTab({ user }: Props) {
                 onClick={() => { openEdit(detail) }}
                 style={{ padding: '6px 12px', background: 'var(--surface2)', border: 'none', borderRadius: '8px', fontSize: '13px', fontWeight: 600, cursor: 'pointer', color: 'var(--text-muted)' }}
               >
-                ?륅툘 ?섏젙
+                ✏️ 수정
               </button>
             </div>
 
             <div style={{ marginBottom: '16px' }}>
               <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '6px' }}>
-                Q1. ?ㅻ뒛 QT瑜?留덉쓬???ㅽ빐 臾듭긽?덈굹??
+                Q1. 오늘 QT를 마음을 다해 묵상했나요?
               </div>
-              <p style={{ fontSize: '14px', lineHeight: 1.7 }}>{detail.q1.text || '??}</p>
+              <p style={{ fontSize: '14px', lineHeight: 1.7 }}>{detail.q1.text || '—'}</p>
             </div>
 
             <div className="divider" />
 
             <div style={{ marginBottom: '16px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-muted)' }}>Q2. ?댁꽍???섏??덈뒗 吏덈Ц??????듭??</div>
-                <span className={detail.q2.isPublic ? 'chip chip-public' : 'chip chip-private'}>{detail.q2.isPublic ? '怨듦컻' : '鍮꾧났媛?}</span>
+                <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-muted)' }}>Q2. 해석에 나와있는 질문에 대한 답은?</div>
+                <span className={detail.q2.isPublic ? 'chip chip-public' : 'chip chip-private'}>{detail.q2.isPublic ? '공개' : '비공개'}</span>
               </div>
-              <p style={{ fontSize: '14px', lineHeight: 1.7 }}>{detail.q2.text || '??}</p>
+              <p style={{ fontSize: '14px', lineHeight: 1.7 }}>{detail.q2.text || '—'}</p>
             </div>
 
             <div className="divider" />
 
             <div style={{ marginBottom: '20px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-muted)' }}>Q3. 媛쒖씤?곸쑝濡??먮???/div>
-                <span className={detail.q3.isPublic ? 'chip chip-public' : 'chip chip-private'}>{detail.q3.isPublic ? '怨듦컻' : '鍮꾧났媛?}</span>
+                <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-muted)' }}>Q3. 개인적으로 느낀점</div>
+                <span className={detail.q3.isPublic ? 'chip chip-public' : 'chip chip-private'}>{detail.q3.isPublic ? '공개' : '비공개'}</span>
               </div>
-              <p style={{ fontSize: '14px', lineHeight: 1.7 }}>{detail.q3.text || '??}</p>
+              <p style={{ fontSize: '14px', lineHeight: 1.7 }}>{detail.q3.text || '—'}</p>
             </div>
 
-            <button className="btn btn-secondary" onClick={() => setDetail(null)}>?リ린</button>
+            <button className="btn btn-secondary" onClick={() => setDetail(null)}>닫기</button>
           </div>
         </div>
       )}
 
-      {/* ?섏젙 紐⑤떖 */}
+      {/* 수정 모달 */}
       {editState && (
         <div className="modal-overlay" onClick={() => setEditState(null)}>
           <div className="modal-sheet" onClick={e => e.stopPropagation()} style={{ maxHeight: '90vh', overflowY: 'auto' }}>
             <div className="modal-handle" />
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-              <div style={{ fontSize: '15px', fontWeight: 700 }}>?륅툘 ?듬? ?섏젙</div>
+              <div style={{ fontSize: '15px', fontWeight: 700 }}>✏️ 답변 수정</div>
               <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>{formatDateKo(editState.entry.date)}</div>
             </div>
 
@@ -273,8 +273,8 @@ export default function MyTab({ user }: Props) {
             {/* Q1 */}
             <div style={{ marginBottom: '14px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                <div style={{ fontSize: '13px', fontWeight: 600 }}>Q1. 留덉쓬???ㅽ빐 臾듭긽?덈굹??</div>
-                <span className="chip chip-public" style={{ fontSize: '11px' }}>?뙇 怨듦컻</span>
+                <div style={{ fontSize: '13px', fontWeight: 600 }}>Q1. 마음을 다해 묵상했나요?</div>
+                <span className="chip chip-public" style={{ fontSize: '11px' }}>🌍 공개</span>
               </div>
               <textarea className="input" rows={3}
                 value={editState.q1}
@@ -284,12 +284,12 @@ export default function MyTab({ user }: Props) {
 
             {/* Q2 */}
             <div style={{ marginBottom: '14px' }}>
-              <div style={{ fontSize: '13px', fontWeight: 600, marginBottom: '6px' }}>Q2. ?댁꽍 吏덈Ц ?듬?</div>
+              <div style={{ fontSize: '13px', fontWeight: 600, marginBottom: '6px' }}>Q2. 해석 질문 답변</div>
               <div className="privacy-toggle" style={{ marginBottom: '8px' }}>
                 <button type="button" className={`privacy-btn ${editState.q2Public ? 'active-public' : ''}`}
-                  onClick={() => setEditState(s => s ? { ...s, q2Public: true } : s)}>?뙇 怨듦컻</button>
+                  onClick={() => setEditState(s => s ? { ...s, q2Public: true } : s)}>🌍 공개</button>
                 <button type="button" className={`privacy-btn ${!editState.q2Public ? 'active-private' : ''}`}
-                  onClick={() => setEditState(s => s ? { ...s, q2Public: false } : s)}>?뵏 鍮꾧났媛?/button>
+                  onClick={() => setEditState(s => s ? { ...s, q2Public: false } : s)}>🔒 비공개</button>
               </div>
               <textarea className="input" rows={4}
                 value={editState.q2}
@@ -299,12 +299,12 @@ export default function MyTab({ user }: Props) {
 
             {/* Q3 */}
             <div style={{ marginBottom: '20px' }}>
-              <div style={{ fontSize: '13px', fontWeight: 600, marginBottom: '6px' }}>Q3. 媛쒖씤?곸쑝濡??먮???/div>
+              <div style={{ fontSize: '13px', fontWeight: 600, marginBottom: '6px' }}>Q3. 개인적으로 느낀점</div>
               <div className="privacy-toggle" style={{ marginBottom: '8px' }}>
                 <button type="button" className={`privacy-btn ${editState.q3Public ? 'active-public' : ''}`}
-                  onClick={() => setEditState(s => s ? { ...s, q3Public: true } : s)}>?뙇 怨듦컻</button>
+                  onClick={() => setEditState(s => s ? { ...s, q3Public: true } : s)}>🌍 공개</button>
                 <button type="button" className={`privacy-btn ${!editState.q3Public ? 'active-private' : ''}`}
-                  onClick={() => setEditState(s => s ? { ...s, q3Public: false } : s)}>?뵏 鍮꾧났媛?/button>
+                  onClick={() => setEditState(s => s ? { ...s, q3Public: false } : s)}>🔒 비공개</button>
               </div>
               <textarea className="input" rows={5}
                 value={editState.q3}
@@ -314,11 +314,11 @@ export default function MyTab({ user }: Props) {
 
             <div style={{ display: 'flex', gap: '8px' }}>
               <button className="btn btn-secondary" onClick={() => setEditState(null)} style={{ flex: 1 }}>
-                痍⑥냼
+                취소
               </button>
               <button className="btn btn-primary" onClick={saveEdit} disabled={editState.saving}
                 style={{ flex: 2, opacity: editState.saving ? 0.7 : 1 }}>
-                {editState.saving ? '???以?..' : '???섏젙 ?꾨즺'}
+                {editState.saving ? '저장 중...' : '✅ 수정 완료'}
               </button>
             </div>
           </div>
