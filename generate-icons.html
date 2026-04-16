@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head><title>아이콘 생성</title></head>
+<body>
+<h2>QT 앱 아이콘 생성기</h2>
+<p>아래 버튼을 누르면 아이콘 파일이 다운로드됩니다. <br>
+다운로드된 파일을 <code>public/icons/</code> 폴더에 넣어주세요.</p>
+<button onclick="generate()">아이콘 생성 및 다운로드</button>
+
+<canvas id="c" style="display:none"></canvas>
+
+<script>
+function drawIcon(canvas, size) {
+  const ctx = canvas.getContext('2d');
+  canvas.width = size;
+  canvas.height = size;
+
+  // Gradient background
+  const grad = ctx.createLinearGradient(0, 0, size, size);
+  grad.addColorStop(0, '#6366f1');
+  grad.addColorStop(1, '#8b5cf6');
+  ctx.fillStyle = grad;
+
+  // Rounded rect
+  const r = size * 0.22;
+  ctx.beginPath();
+  ctx.moveTo(r, 0);
+  ctx.lineTo(size - r, 0);
+  ctx.quadraticCurveTo(size, 0, size, r);
+  ctx.lineTo(size, size - r);
+  ctx.quadraticCurveTo(size, size, size - r, size);
+  ctx.lineTo(r, size);
+  ctx.quadraticCurveTo(0, size, 0, size - r);
+  ctx.lineTo(0, r);
+  ctx.quadraticCurveTo(0, 0, r, 0);
+  ctx.closePath();
+  ctx.fill();
+
+  // Dove emoji style - white cross/dove
+  ctx.fillStyle = 'rgba(255,255,255,0.95)';
+  ctx.font = `${size * 0.55}px serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('🕊️', size / 2, size / 2);
+}
+
+function download(canvas, filename) {
+  const link = document.createElement('a');
+  link.download = filename;
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+}
+
+function generate() {
+  const canvas = document.getElementById('c');
+
+  drawIcon(canvas, 192);
+  download(canvas, 'icon-192.png');
+
+  setTimeout(() => {
+    drawIcon(canvas, 512);
+    download(canvas, 'icon-512.png');
+  }, 500);
+}
+</script>
+</body>
+</html>
