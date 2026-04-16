@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { auth, db, _onAuthStateChanged as onAuthStateChanged } from './firebase'
 import Auth from './components/Auth'
 import TabBar from './components/TabBar'
@@ -15,6 +15,7 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<Tab>('meditation')
 
   useEffect(() => {
+    // 데모 모드에서는 firebase.ts에서 래핑된 onAuthStateChanged가 가짜 유저를 반환합니다.
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser: any) => {
       if (firebaseUser) {
         setUser({
@@ -27,26 +28,39 @@ export default function App() {
         setUser(null)
       }
     })
-    return () => unsubscribe()
+    return () => { if (typeof unsubscribe === 'function') unsubscribe() }
   }, [])
 
-  if (user === undefined) return <div className=\"loading\">🕊️ 불러오는 중...</div>
+  if (user === undefined) {
+    return (
+      <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#6366f1', color: '#fff' }}>
+        🕊️ 불러오는 중...
+      </div>
+    )
+  }
+
   if (!user) return <Auth />
   if (user.isAdmin) return <AdminPage />
 
   return (
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column', background: 'var(--bg)' }}>
-      <div className=\"header\">
+      <div className="header">
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div className=\"header-title\">
+          <div className="header-title">
             {activeTab === 'meditation' ? '🕊️ 오늘의 묵상' : activeTab === 'sharing' ? '💬 나눔' : '👤 마이페이지'}
           </div>
         </div>
       </div>
       <div style={{ flex: 1, overflow: 'hidden', position: 'relative' }}>
-        {activeTab === 'meditation' && <MeditationTab user={user} />}
-        {activeTab === 'sharing' && <SharingTab user={user} />}
-        {activeTab === 'my' && <MyTab user={user} />}
+        <div style={{ display: activeTab === 'meditation' ? 'block' : 'none', height: '100%' }}>
+          <MeditationTab user={user} />
+        </div>
+        <div style={{ display: activeTab === 'sharing' ? 'block' : 'none', height: '100%' }}>
+          <SharingTab user={user} />
+        </div>
+        <div style={{ display: activeTab === 'my' ? 'block' : 'none', height: '100%' }}>
+          <MyTab user={user} />
+        </div>
       </div>
       <TabBar active={activeTab} onChange={setActiveTab} />
     </div>
