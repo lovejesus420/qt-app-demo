@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
-import { onAuthStateChanged } from 'firebase/auth'
+
 import { doc, getDoc } from 'firebase/firestore'
-import { auth, db } from './firebase'
+import { auth, db, _onAuthStateChanged as onAuthStateChanged } from './firebase'
 import Auth from './components/Auth'
 import TabBar from './components/TabBar'
 import MeditationTab from './components/MeditationTab'
@@ -14,7 +14,7 @@ type Tab = 'meditation' | 'sharing' | 'my'
 
 const TAB_LABELS: Record<Tab, string> = {
   meditation: '묵상',
-  sharing: '나눔',
+  sharing: '?�눔',
   my: 'MY',
 }
 
@@ -37,7 +37,7 @@ export default function App() {
           // Fallback: use displayName
           setUser({
             uid: firebaseUser.uid,
-            username: firebaseUser.displayName || '사용자',
+            username: firebaseUser.displayName || '?�용??,
             createdAt: Date.now(),
           })
         }
@@ -60,7 +60,7 @@ export default function App() {
           width: '60px', height: '60px', borderRadius: '16px',
           background: 'rgba(255,255,255,0.2)', display: 'flex',
           alignItems: 'center', justifyContent: 'center', fontSize: '30px',
-        }}>🕊️</div>
+        }}>?���?/div>
         <div style={{ width: '32px', height: '32px', border: '3px solid rgba(255,255,255,0.3)', borderTopColor: '#fff', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
       </div>
     )
@@ -68,7 +68,7 @@ export default function App() {
 
   if (!user) return <Auth />
 
-  // 관리자 전용 페이지
+  // 관리자 ?�용 ?�이지
   if (user.isAdmin) return <AdminPage />
 
   return (
@@ -78,7 +78,7 @@ export default function App() {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div>
             <div className="header-title">
-              {activeTab === 'meditation' ? '🕊️ 오늘의 묵상' : activeTab === 'sharing' ? '💬 나눔' : `👤 ${user.username}`}
+              {activeTab === 'meditation' ? '?���??�늘??묵상' : activeTab === 'sharing' ? '?�� ?�눔' : `?�� ${user.username}`}
             </div>
           </div>
           <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
