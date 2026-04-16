@@ -61,7 +61,9 @@ const storage = {
 // --- Mock Auth ---
 export const mockAuth = {
   currentUser: storage.get<UserProfile | null>(STORAGE_KEYS.USER, null),
-  onAuthStateChanged: (callback: (user: any) => void) => {
+  onAuthStateChanged: (authOrCallback: any, maybeCallback?: (user: any) => void) => {
+    // 실제 Firebase처럼 (auth, callback) 형태로도, (callback) 형태로도 호출 가능
+    const callback = typeof authOrCallback === 'function' ? authOrCallback : maybeCallback!
     const user = storage.get<UserProfile | null>(STORAGE_KEYS.USER, null)
     // 데모 모드에서는 접속 즉시 익명 사용자로 로그인된 것처럼 처리
     if (!user) {

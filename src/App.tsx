@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+﻿import { useState, useEffect } from 'react'
 import { auth, db, _onAuthStateChanged as onAuthStateChanged } from './firebase'
 import Auth from './components/Auth'
 import TabBar from './components/TabBar'
@@ -15,7 +15,6 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<Tab>('meditation')
 
   useEffect(() => {
-    // 데모 모드에서는 firebase.ts에서 래핑된 onAuthStateChanged가 가짜 유저를 반환합니다.
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser: any) => {
       if (firebaseUser) {
         setUser({
@@ -28,7 +27,9 @@ export default function App() {
         setUser(null)
       }
     })
-    return () => { if (typeof unsubscribe === 'function') unsubscribe() }
+    return () => {
+      if (typeof unsubscribe === 'function') unsubscribe()
+    }
   }, [])
 
   if (user === undefined) {
@@ -47,7 +48,7 @@ export default function App() {
       <div className="header">
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div className="header-title">
-            {activeTab === 'meditation' ? '🕊️ 오늘의 묵상' : activeTab === 'sharing' ? '💬 나눔' : '👤 마이페이지'}
+            {activeTab === 'meditation' ? '🕊️ 오늘의 묵상' : activeTab === 'sharing' ? '💬 나눔' : '👤 MY'}
           </div>
         </div>
       </div>
