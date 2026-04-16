@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+﻿import { useState, useEffect } from 'react'
 import { collection, getDocs, query, where, orderBy } from 'firebase/firestore'
 
 import { db, auth, _signOut as signOut } from '../firebase'
@@ -12,14 +12,14 @@ interface MemberRow {
 
 function formatDate(dateStr: string) {
   const [y, m, d] = dateStr.split('-')
-  const days = ['??, '??, '??, '??, '�?, '�?, '??]
+  const days = ['??, '??, '??, '??, '紐?, '湲?, '??]
   const date = new Date(Number(y), Number(m) - 1, Number(d))
   return `${Number(m)}/${Number(d)}(${days[date.getDay()]})`
 }
 
 function formatFullDate(dateStr: string) {
   const [y, m, d] = dateStr.split('-')
-  const days = ['??, '??, '??, '??, '�?, '�?, '??]
+  const days = ['??, '??, '??, '??, '紐?, '湲?, '??]
   const date = new Date(Number(y), Number(m) - 1, Number(d))
   return `${y}??${Number(m)}??${Number(d)}??(${days[date.getDay()]})`
 }
@@ -31,13 +31,13 @@ export default function AdminPage() {
 
   useEffect(() => {
     async function load() {
-      // 1. ?�체 ?�용??가?�오�?(관리자 ?�외)
+      // 1. ?꾩껜 ?ъ슜??媛?몄삤湲?(愿由ъ옄 ?쒖쇅)
       const usersSnap = await getDocs(collection(db, 'users'))
       const users: UserProfile[] = usersSnap.docs
         .map((d) => d.data() as UserProfile)
         .filter((u) => !u.isAdmin)
 
-      // 2. �??�용?�의 QT 기록 가?�오�?      const rows: MemberRow[] = await Promise.all(
+      // 2. 媛??ъ슜?먯쓽 QT 湲곕줉 媛?몄삤湲?      const rows: MemberRow[] = await Promise.all(
         users.map(async (user) => {
           const q = query(
             collection(db, 'qtEntries'),
@@ -50,7 +50,7 @@ export default function AdminPage() {
         })
       )
 
-      // ?�름 ???�렬
+      // ?대쫫 ???뺣젹
       rows.sort((a, b) => a.user.username.localeCompare(b.user.username, 'ko'))
       setMembers(rows)
       setLoading(false)
@@ -72,7 +72,7 @@ export default function AdminPage() {
       <div className="header">
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div>
-            <div className="header-title">?���?관리자 ?�이지</div>
+            <div className="header-title">?썱截?愿由ъ옄 ?섏씠吏</div>
           </div>
           <button
             onClick={() => signOut(auth)}
@@ -81,7 +81,7 @@ export default function AdminPage() {
               border: '1px solid var(--border)', borderRadius: '8px', padding: '4px 10px', cursor: 'pointer',
             }}
           >
-            로그?�웃
+            濡쒓렇?꾩썐
           </button>
         </div>
       </div>
@@ -89,30 +89,30 @@ export default function AdminPage() {
       {/* Content */}
       <div className="scroll-area" style={{ padding: '16px', paddingBottom: '24px' }}>
         {loading ? (
-          <div className="loading"><div className="spinner" /><span>불러?�는 �?..</span></div>
+          <div className="loading"><div className="spinner" /><span>遺덈윭?ㅻ뒗 以?..</span></div>
         ) : (
           <>
-            {/* ?�약 카드 */}
+            {/* ?붿빟 移대뱶 */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '16px' }}>
               <div className="card" style={{ textAlign: 'center', padding: '16px 8px' }}>
                 <div style={{ fontSize: '28px', fontWeight: 800, color: 'var(--primary)' }}>{members.length}</div>
-                <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '4px' }}>?�체 ?�원</div>
+                <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '4px' }}>?꾩껜 ?뚯썝</div>
               </div>
               <div className="card" style={{ textAlign: 'center', padding: '16px 8px' }}>
                 <div style={{ fontSize: '28px', fontWeight: 800, color: '#10b981' }}>{totalEntries}</div>
-                <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '4px' }}>�?QT 기록</div>
+                <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '4px' }}>珥?QT 湲곕줉</div>
               </div>
             </div>
 
-            {/* ?�원 목록 */}
-            <div className="section-label">?�원 목록</div>
+            {/* ?뚯썝 紐⑸줉 */}
+            <div className="section-label">?뚯썝 紐⑸줉</div>
             {members.length === 0 && (
               <div className="card" style={{ textAlign: 'center', color: 'var(--text-muted)' }}>
-                ?�록???�원???�어??              </div>
+                ?깅줉???뚯썝???놁뼱??              </div>
             )}
             {members.map((row) => (
               <div key={row.user.uid} className="card" style={{ marginBottom: '10px', padding: 0, overflow: 'hidden' }}>
-                {/* ?�원 ?�더 */}
+                {/* ?뚯썝 ?ㅻ뜑 */}
                 <button
                   onClick={() => toggleExpand(row.user.uid)}
                   style={{
@@ -135,7 +135,7 @@ export default function AdminPage() {
                         {row.user.username}
                       </div>
                       <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>
-                        QT {row.entries.length}???�료
+                        QT {row.entries.length}???꾨즺
                       </div>
                     </div>
                   </div>
@@ -143,12 +143,12 @@ export default function AdminPage() {
                     ??                  </div>
                 </button>
 
-                {/* QT 기록 목록 */}
+                {/* QT 湲곕줉 紐⑸줉 */}
                 {row.expanded && (
                   <div style={{ borderTop: '1px solid var(--border)' }}>
                     {row.entries.length === 0 ? (
                       <div style={{ padding: '16px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '13px' }}>
-                        ?�직 ?�성??QT가 ?�어??                      </div>
+                        ?꾩쭅 ?묒꽦??QT媛 ?놁뼱??                      </div>
                     ) : (
                       row.entries.map((entry) => (
                         <button
@@ -167,11 +167,11 @@ export default function AdminPage() {
                               {formatDate(entry.date)}
                             </div>
                             <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px', maxWidth: '220px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                              {entry.q1.text || '(?�용 ?�음)'}
+                              {entry.q1.text || '(?댁슜 ?놁쓬)'}
                             </div>
                           </div>
                           <div style={{ fontSize: '12px', color: 'var(--primary)', fontWeight: 600, flexShrink: 0, marginLeft: '8px' }}>
-                            {selectedEntry?.id === entry.id ? '?�기' : '보기'}
+                            {selectedEntry?.id === entry.id ? '?リ린' : '蹂닿린'}
                           </div>
                         </button>
                       ))
@@ -184,7 +184,7 @@ export default function AdminPage() {
         )}
       </div>
 
-      {/* ?�세 ?��? 모달 */}
+      {/* ?곸꽭 ?듬? 紐⑤떖 */}
       {selectedEntry && (
         <div
           onClick={() => setSelectedEntry(null)}
@@ -200,7 +200,7 @@ export default function AdminPage() {
               padding: '20px 16px 40px', maxHeight: '80vh', overflowY: 'auto',
             }}
           >
-            {/* ?�들 */}
+            {/* ?몃뱾 */}
             <div style={{ width: '40px', height: '4px', background: '#e5e7eb', borderRadius: '2px', margin: '0 auto 16px' }} />
 
             <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '4px' }}>
@@ -214,9 +214,9 @@ export default function AdminPage() {
             <div className="question-card" style={{ marginBottom: '10px' }}>
               <div className="question-text">
                 <span className="question-number">1</span>
-                ?�늘 QT�?마음???�해 묵상?�나??
+                ?ㅻ뒛 QT瑜?留덉쓬???ㅽ빐 臾듭긽?덈굹??
               </div>
-              <p style={{ fontSize: '14px', lineHeight: 1.6 }}>{selectedEntry.q1.text || '(미작??'}</p>
+              <p style={{ fontSize: '14px', lineHeight: 1.6 }}>{selectedEntry.q1.text || '(誘몄옉??'}</p>
             </div>
 
             {/* Q2 */}
@@ -225,10 +225,10 @@ export default function AdminPage() {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
                   <div className="question-text" style={{ marginBottom: 0, flex: 1 }}>
                     <span className="question-number">2</span>
-                    ?�석???��??�는 질문???�???��??
+                    ?댁꽍???섏??덈뒗 吏덈Ц??????듭??
                   </div>
                   <span className={selectedEntry.q2.isPublic ? 'chip chip-public' : 'chip chip-private'} style={{ flexShrink: 0, marginLeft: '8px' }}>
-                    {selectedEntry.q2.isPublic ? '?�� 공개' : '?�� 비공�?}
+                    {selectedEntry.q2.isPublic ? '?뙇 怨듦컻' : '?뵏 鍮꾧났媛?}
                   </span>
                 </div>
                 <p style={{ fontSize: '14px', lineHeight: 1.6 }}>{selectedEntry.q2.text}</p>
@@ -241,9 +241,9 @@ export default function AdminPage() {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
                   <div className="question-text" style={{ marginBottom: 0, flex: 1 }}>
                     <span className="question-number">3</span>
-                    개인?�으�??��???                  </div>
+                    媛쒖씤?곸쑝濡??먮???                  </div>
                   <span className={selectedEntry.q3.isPublic ? 'chip chip-public' : 'chip chip-private'} style={{ flexShrink: 0, marginLeft: '8px' }}>
-                    {selectedEntry.q3.isPublic ? '?�� 공개' : '?�� 비공�?}
+                    {selectedEntry.q3.isPublic ? '?뙇 怨듦컻' : '?뵏 鍮꾧났媛?}
                   </span>
                 </div>
                 <p style={{ fontSize: '14px', lineHeight: 1.6 }}>{selectedEntry.q3.text}</p>
@@ -255,7 +255,7 @@ export default function AdminPage() {
               className="btn"
               style={{ width: '100%', marginTop: '8px', background: 'var(--bg)', color: 'var(--text)', border: '1px solid var(--border)' }}
             >
-              ?�기
+              ?リ린
             </button>
           </div>
         </div>

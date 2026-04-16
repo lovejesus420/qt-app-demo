@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+﻿import { useState, useEffect } from 'react'
 
 import { doc, getDoc } from 'firebase/firestore'
 import { auth, db, _onAuthStateChanged as onAuthStateChanged } from './firebase'
@@ -13,8 +13,8 @@ import type { UserProfile } from './types'
 type Tab = 'meditation' | 'sharing' | 'my'
 
 const TAB_LABELS: Record<Tab, string> = {
-  meditation: '묵상',
-  sharing: '?�눔',
+  meditation: '臾듭긽',
+  sharing: '?섎닎',
   my: 'MY',
 }
 
@@ -37,7 +37,7 @@ export default function App() {
           // Fallback: use displayName
           setUser({
             uid: firebaseUser.uid,
-            username: firebaseUser.displayName || '?�용??,
+            username: firebaseUser.displayName || '?ъ슜??,
             createdAt: Date.now(),
           })
         }
@@ -60,7 +60,7 @@ export default function App() {
           width: '60px', height: '60px', borderRadius: '16px',
           background: 'rgba(255,255,255,0.2)', display: 'flex',
           alignItems: 'center', justifyContent: 'center', fontSize: '30px',
-        }}>?���?/div>
+        }}>?븡截?/div>
         <div style={{ width: '32px', height: '32px', border: '3px solid rgba(255,255,255,0.3)', borderTopColor: '#fff', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
       </div>
     )
@@ -68,7 +68,7 @@ export default function App() {
 
   if (!user) return <Auth />
 
-  // 관리자 ?�용 ?�이지
+  // 愿由ъ옄 ?꾩슜 ?섏씠吏
   if (user.isAdmin) return <AdminPage />
 
   return (
@@ -78,7 +78,7 @@ export default function App() {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div>
             <div className="header-title">
-              {activeTab === 'meditation' ? '?���??�늘??묵상' : activeTab === 'sharing' ? '?�� ?�눔' : `?�� ${user.username}`}
+              {activeTab === 'meditation' ? '?븡截??ㅻ뒛??臾듭긽' : activeTab === 'sharing' ? '?뮠 ?섎닎' : `?뫀 ${user.username}`}
             </div>
           </div>
           <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
